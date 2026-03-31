@@ -6,38 +6,80 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <style>
-    body {
-      font-family: Arial;
-      margin: 0;
-      background: #f5f5f5;
-    }
+ body {
+  font-family: Arial;
+  margin: 0;
+  background: #f3f4f6;
+}
 
-    header {
-      background: white;
-      padding: 15px 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px solid #ddd;
-    }
+header {
+  background: white;
+  padding: 15px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #e5e7eb;
+}
 
-    .btn {
-      margin-left: 10px;
-      padding: 8px 14px;
-      border: none;
-      background: #eaeaea;
-      cursor: pointer;
-      border-radius: 6px;
-    }
+header strong {
+  font-size: 18px;
+}
 
-    .btn.active {
-      background: #22c55e;
-      color: white;
-    }
+.btn {
+  margin-left: 10px;
+  padding: 8px 16px;
+  border: none;
+  background: #e5e7eb;
+  cursor: pointer;
+  border-radius: 8px;
+  font-weight: 500;
+}
 
-    .container {
-      padding: 20px;
-    }
+.btn.active {
+  background: #22c55e;
+  color: white;
+}
+
+.container {
+  padding: 24px;
+}
+
+/* CARD */
+.card {
+  background: white;
+  padding: 16px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  margin-bottom: 12px;
+}
+
+/* JOGOS */
+.match {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.match-teams {
+  font-weight: 500;
+}
+
+.live {
+  color: red;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+/* NEWS */
+.news-card img {
+  width: 100%;
+  border-radius: 10px;
+}
+
+.news-card h3 {
+  margin: 10px 0 5px;
+  font-size: 16px;
+}
   </style>
 </head>
 
@@ -86,6 +128,29 @@
     document.querySelectorAll('.btn')[1].classList.add('active');
   }
 }
+  const MATCHES = [
+  { home: "Benfica", away: "Porto", league: "liga-pt", live: true },
+  { home: "Man City", away: "Liverpool", league: "epl", live: true },
+  { home: "Real Madrid", away: "Barcelona", league: "laliga", live: false }
+];
+
+function renderGames() {
+  const container = document.getElementById("games-list");
+
+  const liveGames = MATCHES.filter(m => m.live);
+
+  container.innerHTML = liveGames.map(m => `
+    <div class="card match">
+      <div class="match-teams">
+        ${m.home} vs ${m.away}
+      </div>
+      <div class="live">● LIVE</div>
+    </div>
+  `).join('');
+}
+
+// correr ao abrir
+renderGames();
 </script>
 
 </body>
