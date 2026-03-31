@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ScoutIQ — Football Analytics</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0A0B0F;
+  --bg1:#0F1117;
+  --bg2:#14161E;
+  --bg3:#1A1D28;
+  --bg4:#1E2130;
+  --border:#ffffff0f;
+  --border2:#ffffff18;
+  --border3:#ffffff28;
+  --text:#F4F5F7;
+  --text2:#8B90A0;
+  --text3:#555968;
+  --accent:#3B6FE4;
+  --accent2:#2A53B8;
+  --accent-dim:#3B6FE420;
+  --green:#22C98B;
+  --green-dim:#22C98B18;
+  --amber:#F5A623;
+  --amber-dim:#F5A62318;
+  --red:#E84545;
+  --red-dim:#E8454518;
+  --live:#FF4D4D;
+  --r4:4px;
+  --r6:6px;
+  --r8:8px;
+  --r12:12px;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;line-height:1.5;overflow-x:hidden}
+h1,h2,h3,h4{font-family:'Syne',sans-serif}
+button{cursor:pointer;border:none;background:none;font-family:'DM Sans',sans-serif;color:inherit}
+a{text-decoration:none;color:inherit}
+
+/* Layout */
+.app{display:flex;min-height:100vh}
+.sidebar{width:220px;flex-shrink:0;background:var(--bg1);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:100;transition:transform .3s}
+.main{margin-left:220px;flex:1;min-height:100vh;display:flex;flex-direction:column}
+.topbar{height:56px;background:var(--bg1);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:16px;position:sticky;top:0;z-index:50;backdrop-filter:blur(12px)}
+.content{padding:28px 28px 48px;flex:1}
+
+/* Sidebar */
+.sidebar-logo{padding:20px 20px 16px;border-bottom:1px solid var(--border)}
+.logo-mark{display:flex;align-items:center;gap:10px}
+.logo-icon{width:30px;height:30px;background:var(--accent);border-radius:var(--r8);display:flex;align-items:center;justify-content:center}
+.logo-icon svg{width:16px;height:16px}
+.logo-text{font-family:'Syne',sans-serif;font-weight:700;font-size:16px;letter-spacing:-.3px}
+.logo-badge{font-size:9px;background:var(--bg3);border:1px solid var(--border2);color:var(--text2);padding:1px 6px;border-radius:20px;letter-spacing:.5px;text-transform:uppercase}
+.nav-section{padding:16px 12px 8px}
+.nav-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;padding:0 8px;margin-bottom:6px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:var(--r8);color:var(--text2);font-size:13px;transition:all .15s;cursor:pointer;margin-bottom:2px}
+.nav-item:hover{background:var(--bg3);color:var(--text)}
+.nav-item.active{background:var(--accent-dim);color:var(--accent);border:1px solid var(--accent)22}
+.nav-item svg{width:15px;height:15px;flex-shrink:0}
+.sidebar-footer{margin-top:auto;padding:16px;border-top:1px solid var(--border)}
+.accuracy-card{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r12);padding:12px;margin-bottom:12px}
+.accuracy-label{font-size:11px;color:var(--text2);margin-bottom:6px}
+.accuracy-val{font-family:'Syne',sans-serif;font-size:20px;font-weight:700;color:var(--green)}
+.accuracy-sub{font-size:11px;color:var(--text3)}
+.progress-bar{height:4px;background:var(--bg4);border-radius:2px;overflow:hidden;margin:8px 0 4px}
+.progress-fill{height:100%;background:var(--green);border-radius:2px;transition:width .6s ease}
+
+/* Topbar */
+.topbar-left{display:flex;align-items:center;gap:8px;flex:1}
+.page-title{font-family:'Syne',sans-serif;font-weight:600;font-size:15px}
+.search-box{display:flex;align-items:center;gap:8px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r8);padding:6px 12px;max-width:280px;width:100%}
+.search-box svg{width:14px;height:14px;color:var(--text3);flex-shrink:0}
+.search-box input{background:none;border:none;outline:none;color:var(--text);font-size:13px;width:100%;font-family:'DM Sans',sans-serif}
+.search-box input::placeholder{color:var(--text3)}
+.topbar-right{display:flex;align-items:center;gap:10px}
+.badge-pill{background:var(--bg3);border:1px solid var(--border2);border-radius:20px;padding:4px 10px;font-size:12px;color:var(--text2)}
+.avatar{width:30px;height:30px;background:linear-gradient(135deg,#3B6FE4,#7B5CF6);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:11px;font-weight:700}
+
+/* Dashboard Hero */
+.hero-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:14px;margin-bottom:28px}
+.stat-card{background:var(--bg1);border:1px solid var(--border);border-radius:var(--r12);padding:18px;position:relative;overflow:hidden;transition:border-color .2s}
+.stat-card:hover{border-color:var(--border3)}
+.stat-card::before{content:'';position:absolute;inset:0;opacity:0;transition:opacity .2s}
+.stat-card:hover::before{opacity:1}
+.stat-label{font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px}
+.stat-value{font-family:'Syne',sans-serif;font-size:28px;font-weight:700;line-height:1;margin-bottom:6px}
+.stat-change{display:flex;align-items:center;gap:4px;font-size:12px}
+.stat-up{color:var(--green)}
+.stat-down{color:var(--red)}
+.stat-icon{position:absolute;top:18px;right:18px;width:36px;height:36px;border-radius:var(--r8);display:flex;align-items:center;justify-content:center}
+.stat-icon svg{width:18px;height:18px}
+
+/* Match Section */
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.section-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:600;display:flex;align-items:center;gap:8px}
+.live-dot{width:6px;height:6px;background:var(--live);border-radius:50%;animation:pulse 1.4s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.8)}}
+.section-action{font-size:12px;color:var(--text2);border:1px solid var(--border2);border-radius:var(--r6);padding:5px 10px;transition:all .15s}
+.section-action:hover{border-color:var(--border3);color:var(--text)}
+
+/* Filters */
+.filter-row{display:flex;align-items:center;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.filter-btn{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r6);padding:5px 12px;font-size:12px;color:var(--text2);transition:all .15s;white-space:nowrap}
+.filter-btn:hover,.filter-btn.active{background:var(--bg3);border-color:var(--border3);color:var(--text)}
+.filter-btn.active{background:var(--accent-dim);border-color:var(--accent)44;color:var(--accent)}
+
+/* Match Cards */
+.matches-grid{display:flex;flex-direction:column;gap:8px}
+.match-card{background:var(--bg1);border:1px solid var(--border);border-radius:var(--r12);padding:16px 20px;display:grid;grid-template-columns:140px 1fr auto;gap:16px;align-items:center;transition:all .2s;cursor:pointer}
+.match-card:hover{border-color:var(--border3);background:var(--bg2);transform:translateY(-1px)}
+.match-meta{display:flex;flex-direction:column;gap:4px}
+.match-time{font-family:'Syne',sans-serif;font-size:15px;font-weight:600}
+.match-league{font-size:11px;color:var(--text2);display:flex;align-items:center;gap:5px}
+.league-dot{width:5px;height:5px;border-radius:50%}
+.match-main{display:flex;align-items:center;gap:12px}
+.team-row{display:flex;flex-direction:column;gap:10px;flex:1}
+.team-item{display:flex;align-items:center;gap:10px}
+.team-crest{width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;background:var(--bg3)}
+.team-name{font-size:13px;font-weight:500}
+.score-area{display:flex;flex-direction:column;align-items:center;gap:6px;min-width:36px}
+.score-box{font-family:'Syne',sans-serif;font-size:17px;font-weight:700;text-align:center}
+.vs-text{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px}
+.match-actions{display:flex;flex-direction:column;gap:8px;align-items:flex-end}
+.status-badge{padding:3px 8px;border-radius:20px;font-size:10px;font-weight:500;letter-spacing:.3px;text-transform:uppercase}
+.status-live{background:var(--red-dim);color:var(--live);border:1px solid var(--live)33}
+.status-upcoming{background:var(--bg3);color:var(--text2);border:1px solid var(--border2)}
+.status-finished{background:var(--bg3);color:var(--text3);border:1px solid var(--border)}
+.analyze-btn{background:var(--accent-dim);border:1px solid var(--accent)33;color:var(--accent);border-radius:var(--r6);padding:6px 12px;font-size:12px;font-weight:500;transition:all .15s;display:flex;align-items:center;gap:5px;white-space:nowrap}
+.analyze-btn:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
+.analyze-btn svg{width:12px;height:12px}
+
+/* Prediction mini */
+.prob-mini{display:flex;gap:4px;align-items:center;margin-top:4px}
+.prob-seg{height:3px;border-radius:2px;transition:width .4s}
+.prob-labels{display:flex;justify-content:space-between;font-size:10px;color:var(--text3);margin-top:2px}
+
+/* Analysis View */
+.analysis-back{display:flex;align-items:center;gap:8px;color:var(--text2);font-size:13px;margin-bottom:24px;cursor:pointer;transition:color .15s;width:fit-content}
+.analysis-back:hover{color:var(--text)}
+.analysis-back svg{width:14px;height:14px}
+.analysis-hero{background:var(--bg1);border:1px solid var(--border);border-radius:16px;padding:24px 28px;margin-bottom:20px}
+.analysis-fixture{display:flex;align-items:center;justify-content:center;gap:24px;margin:16px 0 20px}
+.analysis-team{display:flex;flex-direction:column;align-items:center;gap:8px}
+.analysis-crest{width:56px;height:56px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:26px;background:var(--bg3)}
+.analysis-teamname{font-family:'Syne',sans-serif;font-size:15px;font-weight:600;text-align:center}
+.analysis-vs{font-family:'Syne',sans-serif;font-size:28px;font-weight:700;color:var(--text3)}
+.analysis-meta{display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap}
+.meta-chip{background:var(--bg3);border:1px solid var(--border2);border-radius:20px;padding:4px 12px;font-size:11px;color:var(--text2)}
+
+.analysis-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.analysis-card{background:var(--bg1);border:1px solid var(--border);border-radius:var(--r12);padding:20px}
+.analysis-card-full{background:var(--bg1);border:1px solid var(--border);border-radius:var(--r12);padding:20px;margin-bottom:14px}
+.card-title{font-family:'Syne',sans-serif;font-size:13px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:16px}
+
+/* Probability bars */
+.prob-row{display:flex;gap:0;border-radius:var(--r8);overflow:hidden;height:44px;margin-bottom:12px}
+.prob-segment{display:flex;align-items:center;justify-content:center;flex-direction:column;gap:2px;transition:flex .6s ease}
+.prob-segment span:first-child{font-family:'Syne',sans-serif;font-size:15px;font-weight:700}
+.prob-segment span:last-child{font-size:10px;opacity:.7}
+.prob-home{background:var(--accent);color:#fff}
+.prob-draw{background:var(--bg4);color:var(--text2)}
+.prob-away{background:var(--bg3);color:var(--text2);border:1px solid var(--border2)}
+.prob-labels-full{display:flex;justify-content:space-between;font-size:11px;color:var(--text3)}
+
+/* Stats comparison */
+.stat-row{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.stat-row-label{font-size:12px;color:var(--text2);flex:1;text-align:center}
+.stat-row-bar{flex:2;height:6px;background:var(--bg4);border-radius:3px;overflow:hidden;position:relative}
+.stat-bar-home{height:100%;background:var(--accent);border-radius:3px;position:absolute;right:0}
+.stat-bar-away{height:100%;background:var(--text3);border-radius:3px;position:absolute;left:0}
+.stat-num{font-family:'Syne',sans-serif;font-size:13px;font-weight:600;min-width:32px}
+.stat-num-home{text-align:left}
+.stat-num-away{text-align:right}
+
+/* Form indicators */
+.form-row{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.form-team{font-size:13px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.form-dots{display:flex;gap:4px}
+.form-dot{width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700}
+.form-W{background:var(--green-dim);color:var(--green);border:1px solid var(--green)33}
+.form-D{background:var(--amber-dim);color:var(--amber);border:1px solid var(--amber)33}
+.form-L{background:var(--red-dim);color:var(--red);border:1px solid var(--red)33}
+
+/* Prediction verdict */
+.verdict-card{background:var(--accent-dim);border:1px solid var(--accent)33;border-radius:var(--r12);padding:20px;margin-bottom:14px}
+.verdict-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.verdict-title{font-family:'Syne',sans-serif;font-size:14px;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:.5px}
+.verdict-conf{font-size:11px;color:var(--accent);opacity:.7}
+.verdict-text{font-size:14px;color:var(--text);line-height:1.6}
+.verdict-disclaimer{font-size:11px;color:var(--text3);margin-top:10px;display:flex;align-items:center;gap:4px}
+.verdict-disclaimer svg{width:11px;height:11px;flex-shrink:0}
+
+/* News */
+.news-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:28px}
+.news-card{background:var(--bg1);border:1px solid var(--border);border-radius:var(--r12);overflow:hidden;transition:all .2s;cursor:pointer}
+.news-card:hover{border-color:var(--border3);transform:translateY(-2px)}
+.news-img{height:120px;overflow:hidden;position:relative}
+.news-img-inner{width:100%;height:100%;object-fit:cover;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:32px}
+.news-body{padding:14px}
+.news-tag{font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:var(--accent);margin-bottom:6px}
+.news-title{font-family:'Syne',sans-serif;font-size:13px;font-weight:600;line-height:1.4;margin-bottom:6px;color:var(--text)}
+.news-desc{font-size:12px;color:var(--text2);line-height:1.5}
+.news-date{font-size:11px;color:var(--text3);margin-top:8px}
+
+/* Divider row */
+.two-col{display:grid;grid-template-columns:2fr 1fr;gap:14px;margin-bottom:14px}
+
+/* Scrollbar */
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border3);border-radius:2px}
+
+/* Mobile */
+@media(max-width:900px){
+  .sidebar{transform:translateX(-100%)}
+  .main{margin-left:0}
+  .hero-grid{grid-template-columns:1fr 1fr}
+  .analysis-grid{grid-template-columns:1fr}
+  .news-grid{grid-template-columns:1fr 1fr}
+  .two-col{grid-template-columns:1fr}
+  .match-card{grid-template-columns:100px 1fr auto;gap:10px;padding:12px 14px}
+}
+@media(max-width:600px){
+  .hero-grid{grid-template-columns:1fr}
+  .news-grid{grid-template-columns:1fr}
+  .content{padding:16px}
+}
+</style>
+</head>
+<body>
+
+<div class="app" id="app">
+
+<!-- SIDEBAR -->
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-mark">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><circle cx="12" cy="12" r="9"/><path d="M12 3v9l6 3"/></svg>
+      </div>
+      <div>
+        <div class="logo-text">ScoutIQ</div>
+      </div>
+    </div>
+    <div style="margin-top:6px"><span class="logo-badge">Analytics Pro</span></div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">Platform</div>
+    <div class="nav-item active" onclick="showPage('dashboard')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      Dashboard
+    </div>
+    <div class="nav-item" onclick="showPage('matches')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M4.93 4.93l14.14 14.14M19.07 4.93L4.93 19.07"/></svg>
+      Matches
+    </div>
+    <div class="nav-item" onclick="showPage('dashboard')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      Predictions
+    </div>
+    <div class="nav-item" onclick="showPage('dashboard')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M18 9l-5-5-4 4-3-3"/></svg>
+      Statistics
+    </div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">Leagues</div>
+    <div class="nav-item" onclick="">
+      <span style="font-size:14px">🏴󠁧󠁢󠁥󠁮󠁧󠁿</span> Premier League
+    </div>
+    <div class="nav-item">
+      <span style="font-size:14px">🇪🇸</span> La Liga
+    </div>
+    <div class="nav-item">
+      <span style="font-size:14px">⭐</span> Champions League
+    </div>
+    <div class="nav-item">
+      <span style="font-size:14px">🇩🇪</span> Bundesliga
+    </div>
+  </div>
+
+  <div class="sidebar-footer">
+    <div class="accuracy-card">
+      <div class="accuracy-label">Season accuracy</div>
+      <div class="accuracy-val">74.2%</div>
+      <div class="progress-bar"><div class="progress-fill" style="width:74.2%"></div></div>
+      <div class="accuracy-sub">Based on 831 predictions</div>
+    </div>
+    <div class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+      Account
+    </div>
+  </div>
+</nav>
+
+<!-- MAIN CONTENT -->
+<div class="main">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="page-title" id="page-title">Dashboard</div>
+    </div>
+    <div class="search-box">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" placeholder="Search teams, competitions…">
+    </div>
+    <div class="topbar-right">
+      <span class="badge-pill">GW 32 · EPL</span>
+      <div class="avatar">JD</div>
+    </div>
+  </div>
+
+  <!-- PAGES -->
+  <div class="content">
+
+    <!-- DASHBOARD PAGE -->
+    <div id="page-dashboard">
+
+      <!-- Stats Row -->
+      <div class="hero-grid">
+        <div class="stat-card">
+          <div class="stat-icon" style="background:var(--accent-dim)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 3v9l6 3"/></svg>
+          </div>
+          <div class="stat-label">Matches Analyzed</div>
+          <div class="stat-value">2,841</div>
+          <div class="stat-change stat-up">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px;height:12px"><polyline points="18 15 12 9 6 15"/></svg>
+            +47 this week
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:var(--green-dim)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div class="stat-label">Prediction Accuracy</div>
+          <div class="stat-value" style="color:var(--green)">74.2%</div>
+          <div class="stat-change stat-up">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px;height:12px"><polyline points="18 15 12 9 6 15"/></svg>
+            +1.4% vs last month
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:var(--amber-dim)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="var(--amber)" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+          </div>
+          <div class="stat-label">Live Now</div>
+          <div class="stat-value" style="color:var(--amber)">3</div>
+          <div class="stat-change" style="color:var(--text3)">6 upcoming today</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:var(--red-dim)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2"><path d="M3 3v18h18"/><path d="M18 9l-5-5-4 4-3-3"/></svg>
+          </div>
+          <div class="stat-label">Models Tracked</div>
+          <div class="stat-value">12</div>
+          <div class="stat-change" style="color:var(--text3)">xG, form, H2H & more</div>
+        </div>
+      </div>
+
+      <!-- Two-col: Live Matches + Top Prediction -->
+      <div class="two-col">
+
+        <!-- Matches Column -->
+        <div>
+          <div class="section-header">
+            <div class="section-title">
+              <div class="live-dot"></div>
+              Live & Upcoming
+            </div>
+            <button class="section-action" onclick="showPage('matches')">View all →</button>
+          </div>
+          <div class="filter-row">
+            <button class="filter-btn active" onclick="filterMatches(this,'all')">All</button>
+            <button class="filter-btn" onclick="filterMatches(this,'live')">Live</button>
+            <button class="filter-btn" onclick="filterMatches(this,'upcoming')">Upcoming</button>
+            <button class="filter-btn" onclick="filterMatches(this,'epl')">Premier League</button>
+            <button class="filter-btn" onclick="filterMatches(this,'ucl')">UCL</button>
+          </div>
+          <div class="matches-grid" id="matches-list"></div>
+        </div>
+
+        <!-- Right: Prediction of the Day + Model Info -->
+        <div>
+          <div class="section-header">
+            <div class="section-title">Model Confidence</div>
+          </div>
+          <div class="analysis-card" style="margin-bottom:14px">
+            <div class="card-title">High confidence picks</div>
+            <div id="confidence-list"></div>
+          </div>
+          <div class="analysis-card">
+            <div class="card-title">Data sources</div>
+            <div id="data-sources"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- News -->
+      <div class="section-header">
+        <div class="section-title">Latest Football Intelligence</div>
+        <button class="section-action">All news →</button>
+      </div>
+      <div class="news-grid" id="news-grid"></div>
+
+    </div><!-- end dashboard -->
+
+    <!-- MATCHES PAGE -->
+    <div id="page-matches" style="display:none">
+      <div class="section-header">
+        <div class="section-title">All Fixtures</div>
+      </div>
+      <div class="filter-row">
+        <button class="filter-btn active" onclick="filterMatches2(this,'all')">All</button>
+        <button class="filter-btn" onclick="filterMatches2(this,'live')">🔴 Live (3)</button>
+        <button class="filter-btn" onclick="filterMatches2(this,'upcoming')">Upcoming</button>
+        <button class="filter-btn" onclick="filterMatches2(this,'finished')">Finished</button>
+      </div>
+      <div class="matches-grid" id="matches-list-full"></div>
+    </div>
+
+    <!-- ANALYSIS PAGE -->
+    <div id="page-analysis" style="display:none">
+      <div class="analysis-back" onclick="goBack()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+        Back to fixtures
+      </div>
+      <div id="analysis-content"></div>
+    </div>
+
+  </div><!-- end content -->
+</div><!-- end main -->
+</div><!-- end app -->
+
+<script>
+const MATCHES = [
+  {id:1,time:'15:30',date:'Today',league:'Premier League',leagueColor:'#3B6FE4',leagueShort:'EPL',homeTeam:'Arsenal',homeEmoji:'🔴',awayTeam:'Chelsea',awayEmoji:'🔵',status:'live',minute:67,score:'2-1',probHome:58,probDraw:22,probAway:20,homeForm:['W','W','D','W','L'],awayForm:['D','W','L','W','W'],stats:{possession:[62,38],shots:[14,8],shotsOnTarget:[6,3],xG:[1.8,0.9],corners:[7,4],fouls:[9,14]},prediction:'Arsenal edge this one at home, backed by a strong xG differential and current form advantage. Chelsea's counter-attacking threat is real, but the hosts have control of this match.'},
+  {id:2,time:'17:45',date:'Today',league:'Champions League',leagueColor:'#FFD700',leagueShort:'UCL',homeTeam:'Real Madrid',homeEmoji:'⚪',awayTeam:'Man City',awayEmoji:'🩵',status:'upcoming',minute:null,score:null,probHome:45,probDraw:26,probAway:29,homeForm:['W','W','W','D','W'],awayForm:['W','D','W','W','L'],stats:{possession:[55,45],shots:[12,10],shotsOnTarget:[5,4],xG:[1.5,1.2],corners:[5,6],fouls:[11,10]},prediction:'A very evenly matched tie. Real Madrid's home record is exceptional but Man City's away form in Europe is equally formidable. Slight edge to the hosts based on historical UCL performance.'},
+  {id:3,time:'20:00',date:'Today',league:'Premier League',leagueColor:'#3B6FE4',leagueShort:'EPL',homeTeam:'Liverpool',homeEmoji:'❤️',awayTeam:'Man United',awayEmoji:'🔴',status:'live',minute:42,score:'1-0',probHome:62,probDraw:20,probAway:18,homeForm:['W','W','W','W','D'],awayForm:['L','D','W','L','L'],stats:{possession:[67,33],shots:[9,4],shotsOnTarget:[4,1],xG:[1.4,0.3],corners:[6,2],fouls:[8,13]},prediction:'Liverpool are in dominant form and United are struggling. The xG split tells the real story — this is one-way traffic statistically.'},
+  {id:4,time:'12:30',date:'Tomorrow',league:'La Liga',leagueColor:'#D4302D',leagueShort:'LAL',homeTeam:'Barcelona',homeEmoji:'🔵',awayTeam:'Atletico',awayEmoji:'🔴',status:'upcoming',minute:null,score:null,probHome:52,probDraw:25,probAway:23,homeForm:['W','D','W','W','W'],awayForm:['W','W','D','L','W'],stats:{possession:[60,40],shots:[13,9],shotsOnTarget:[5,4],xG:[1.7,1.1],corners:[6,5],fouls:[10,12]},prediction:'Barcelona at home is a tough assignment for any team. Their possession dominance will be key. Atletico's defensive block could make this tight, but the quality edge goes to the hosts.'},
+  {id:5,time:'15:00',date:'Tomorrow',league:'Bundesliga',leagueColor:'#E31A2F',leagueShort:'BUN',homeTeam:'Bayern',homeEmoji:'⚽',awayTeam:'Dortmund',awayEmoji:'🟡',status:'upcoming',minute:null,score:null,probHome:61,probDraw:19,probAway:20,homeForm:['W','W','W','L','W'],awayForm:['W','D','W','W','L'],stats:{possession:[58,42],shots:[15,11],shotsOnTarget:[7,4],xG:[2.1,1.3],corners:[8,5],fouls:[9,11]},prediction:'Der Klassiker rarely disappoints. Bayern's home record this season has been exceptional. Dortmund's attacking quality makes this a high-scoring game — but Bayern should have enough.'},
+  {id:6,time:'19:45',date:'Yesterday',league:'Serie A',leagueColor:'#008FD4',leagueShort:'SRA',homeTeam:'Inter Milan',homeEmoji:'🟦',awayTeam:'Juventus',awayEmoji:'⚫',status:'finished',minute:90,score:'3-1',probHome:55,probDraw:24,probAway:21,homeForm:['W','W','D','W','W'],awayForm:['D','W','L','D','W'],stats:{possession:[54,46],shots:[16,9],shotsOnTarget:[7,3],xG:[2.4,1.0],corners:[9,4],fouls:[10,13]},prediction:'Inter controlled this match throughout.'},
+];
+
+const NEWS = [
+  {emoji:'⚽',tag:'Transfer News',title:'Bellingham linked with record-breaking summer move amid contract speculation',desc:'Reports from Madrid suggest the club is monitoring exit clauses ahead of the window.',date:'2h ago'},
+  {emoji:'📊',tag:'Analytics',title:'How xG models are reshaping how clubs recruit in modern football',desc:'Data-driven scouting has become standard across Europe\'s top five leagues.',date:'4h ago'},
+  {emoji:'🏆',tag:'Champions League',title:'Semi-final draw confirmed: four clubs remain with historic tie on the cards',desc:'UEFA\'s draw produced the most anticipated matchup in a decade of European football.',date:'6h ago'},
+  {emoji:'🧠',tag:'Tactics',title:'The pressing revolution: why high defensive lines now dominate elite football',desc:'Post-match data shows teams with higher PPDA scores winning 43% more games.',date:'Yesterday'},
+  {emoji:'🔴',tag:'Premier League',title:'Arsenal's title credentials under microscope after back-to-back high-pressure fixtures',desc:'Form data shows the Gunners' xG output leads the league for the third consecutive month.',date:'Yesterday'},
+  {emoji:'💊',tag:'Injury Update',title:'Key midfielder set for return as medical team clears training participation',desc:'The international returns to full squad selection ahead of the weekend fixture.',date:'2 days ago'},
+];
+
+const DATA_SOURCES = [
+  {label:'Match xG models',desc:'Expected goals via shot quality matrix'},
+  {label:'Team form index',desc:'Weighted rolling 10-game window'},
+  {label:'Head-to-head history',desc:'Last 8 meetings, venue-adjusted'},
+  {label:'Player availability',desc:'Squad fitness & suspension data'},
+  {label:'Tactical patterns',desc:'Pressing, build-up & shape analysis'},
+];
+
+let currentFilter = 'all';
+let prevPage = 'dashboard';
+
+function renderMatchCard(m, containerId){
+  const el = document.getElementById(containerId);
+  const div = document.createElement('div');
+  div.className = 'match-card';
+  div.dataset.status = m.status;
+  div.dataset.league = m.leagueShort.toLowerCase();
+
+  const scoreOrVS = m.score
+    ? `<div class="score-box">${m.score}</div>`
+    : `<div class="vs-text">vs</div>`;
+  const minuteTag = m.status==='live' ? `<span style="font-size:10px;color:var(--live);font-weight:600">${m.minute}'</span>` : '';
+
+  const probBar = `
+    <div style="margin-top:4px">
+      <div style="display:flex;gap:2px;height:3px;border-radius:2px;overflow:hidden">
+        <div style="flex:${m.probHome};background:var(--accent);border-radius:2px"></div>
+        <div style="flex:${m.probDraw};background:var(--text3);border-radius:2px"></div>
+        <div style="flex:${m.probAway};background:var(--bg4);border:1px solid var(--border2);border-radius:2px"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--text3);margin-top:2px">
+        <span>H ${m.probHome}%</span><span>D ${m.probDraw}%</span><span>A ${m.probAway}%</span>
+      </div>
+    </div>`;
+
+  const statusBadge = m.status==='live'
+    ? `<span class="status-badge status-live">⬤ Live ${m.minute}'</span>`
+    : m.status==='upcoming'
+    ? `<span class="status-badge status-upcoming">${m.time}</span>`
+    : `<span class="status-badge status-finished">FT</span>`;
+
+  div.innerHTML = `
+    <div class="match-meta">
+      <div class="match-time">${m.status==='live'?'🔴 '+m.minute+'\'':(m.status==='finished'?'FT':m.time)}</div>
+      <div class="match-league">
+        <span class="league-dot" style="background:${m.leagueColor}"></span>
+        ${m.league}
+      </div>
+      <div style="margin-top:4px;font-size:11px;color:var(--text3)">${m.date}</div>
+    </div>
+    <div class="match-main">
+      <div class="team-row">
+        <div class="team-item">
+          <div class="team-crest">${m.homeEmoji}</div>
+          <span class="team-name">${m.homeTeam}</span>
+        </div>
+        <div class="team-item">
+          <div class="team-crest">${m.awayEmoji}</div>
+          <span class="team-name">${m.awayTeam}</span>
+        </div>
+      </div>
+      <div class="score-area">${scoreOrVS}${minuteTag}</div>
+      <div style="flex:1.2">${probBar}</div>
+    </div>
+    <div class="match-actions">
+      ${statusBadge}
+      <button class="analyze-btn" onclick="openAnalysis(${m.id},event)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        Analyse
+      </button>
+    </div>`;
+  el.appendChild(div);
+}
+
+function renderAllMatches(){
+  const c1 = document.getElementById('matches-list');
+  const c2 = document.getElementById('matches-list-full');
+  c1.innerHTML=''; c2.innerHTML='';
+  MATCHES.forEach(m=>{
+    renderMatchCard(m,'matches-list');
+    renderMatchCard(m,'matches-list-full');
+  });
+}
+
+function filterMatches(btn, type){
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const cards = document.querySelectorAll('#matches-list .match-card');
+  cards.forEach(c=>{
+    if(type==='all') c.style.display='';
+    else if(type==='epl') c.style.display=c.dataset.league==='epl'?'':'none';
+    else if(type==='ucl') c.style.display=c.dataset.league==='ucl'?'':'none';
+    else c.style.display=c.dataset.status===type?'':'none';
+  });
+}
+function filterMatches2(btn,type){
+  btn.closest('.filter-row').querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const cards = document.querySelectorAll('#matches-list-full .match-card');
+  cards.forEach(c=>{
+    c.style.display=(type==='all'||c.dataset.status===type)?'':'none';
+  });
+}
+
+function renderConfidence(){
+  const el = document.getElementById('confidence-list');
+  const picks = MATCHES.filter(m=>m.probHome>55||m.probAway>50).slice(0,3);
+  el.innerHTML = picks.map(m=>{
+    const pick = m.probHome>55?`${m.homeTeam} Win`:m.probAway>50?`${m.awayTeam} Win`:'Draw';
+    const conf = m.probHome>55?m.probHome:m.probAway;
+    return `<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)">
+      <div>
+        <div style="font-size:12px;font-weight:500">${m.homeTeam} vs ${m.awayTeam}</div>
+        <div style="font-size:11px;color:var(--text2);margin-top:2px">${pick}</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--green)">${conf}%</div>
+        <div style="font-size:10px;color:var(--text3)">confidence</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderDataSources(){
+  const el = document.getElementById('data-sources');
+  el.innerHTML = DATA_SOURCES.map(d=>`
+    <div style="display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">
+      <div style="width:6px;height:6px;background:var(--accent);border-radius:50%;margin-top:5px;flex-shrink:0"></div>
+      <div>
+        <div style="font-size:12px;font-weight:500">${d.label}</div>
+        <div style="font-size:11px;color:var(--text2)">${d.desc}</div>
+      </div>
+    </div>`).join('');
+}
+
+function renderNews(){
+  const grid = document.getElementById('news-grid');
+  grid.innerHTML = NEWS.map(n=>`
+    <div class="news-card">
+      <div class="news-img">
+        <div class="news-img-inner">${n.emoji}</div>
+      </div>
+      <div class="news-body">
+        <div class="news-tag">${n.tag}</div>
+        <div class="news-title">${n.title}</div>
+        <div class="news-desc">${n.desc}</div>
+        <div class="news-date">${n.date}</div>
+      </div>
+    </div>`).join('');
+}
+
+function openAnalysis(id, e){
+  if(e) e.stopPropagation();
+  const m = MATCHES.find(x=>x.id===id);
+  if(!m) return;
+  prevPage = document.getElementById('page-matches').style.display==='none'?'dashboard':'matches';
+  showPage('analysis');
+  renderAnalysis(m);
+}
+
+function renderAnalysis(m){
+  const el = document.getElementById('analysis-content');
+  const statRows = [
+    {label:'Possession',home:m.stats.possession[0]+'%',away:m.stats.possession[1]+'%',hv:m.stats.possession[0],av:m.stats.possession[1]},
+    {label:'Shots',home:m.stats.shots[0],away:m.stats.shots[1],hv:m.stats.shots[0]*5,av:m.stats.shots[1]*5},
+    {label:'On Target',home:m.stats.shotsOnTarget[0],away:m.stats.shotsOnTarget[1],hv:m.stats.shotsOnTarget[0]*8,av:m.stats.shotsOnTarget[1]*8},
+    {label:'xG',home:m.stats.xG[0],away:m.stats.xG[1],hv:m.stats.xG[0]*30,av:m.stats.xG[1]*30},
+    {label:'Corners',home:m.stats.corners[0],away:m.stats.corners[1],hv:m.stats.corners[0]*8,av:m.stats.corners[1]*8},
+    {label:'Fouls',home:m.stats.fouls[0],away:m.stats.fouls[1],hv:m.stats.fouls[0]*5,av:m.stats.fouls[1]*5},
+  ];
+
+  const formDots = (form)=>form.map(r=>`<div class="form-dot form-${r}">${r}</div>`).join('');
+
+  el.innerHTML = `
+    <div class="analysis-hero">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:12px">
+        <div class="match-league">
+          <span class="league-dot" style="background:${m.leagueColor}"></span>
+          ${m.league}
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          ${m.status==='live'?`<span class="status-badge status-live">⬤ Live ${m.minute}'</span>`:`<span class="status-badge status-upcoming">${m.date} · ${m.time}</span>`}
+        </div>
+      </div>
+      <div class="analysis-fixture">
+        <div class="analysis-team">
+          <div class="analysis-crest">${m.homeEmoji}</div>
+          <div class="analysis-teamname">${m.homeTeam}</div>
+          <div style="font-size:11px;color:var(--text3)">Home</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
+          ${m.score?`<div style="font-family:'Syne',sans-serif;font-size:36px;font-weight:800;letter-spacing:-1px">${m.score}</div><div style="font-size:11px;color:var(--red)">Live ${m.minute}'</div>`:`<div class="analysis-vs">vs</div>`}
+        </div>
+        <div class="analysis-team">
+          <div class="analysis-crest">${m.awayEmoji}</div>
+          <div class="analysis-teamname">${m.awayTeam}</div>
+          <div style="font-size:11px;color:var(--text3)">Away</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="verdict-card">
+      <div class="verdict-header">
+        <div class="verdict-title">Model Assessment</div>
+        <div class="verdict-conf">Model confidence: ${Math.max(m.probHome,m.probAway,m.probDraw)}%</div>
+      </div>
+      <div class="verdict-text">${m.prediction}</div>
+      <div class="verdict-disclaimer">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        This assessment is based on statistical models and historical data. Not financial advice.
+      </div>
+    </div>
+
+    <div class="analysis-grid">
+      <div class="analysis-card">
+        <div class="card-title">Win probability</div>
+        <div class="prob-row">
+          <div class="prob-segment prob-home" style="flex:${m.probHome}">
+            <span>${m.probHome}%</span><span>Home</span>
+          </div>
+          <div class="prob-segment prob-draw" style="flex:${m.probDraw}">
+            <span>${m.probDraw}%</span><span>Draw</span>
+          </div>
+          <div class="prob-segment prob-away" style="flex:${m.probAway}">
+            <span>${m.probAway}%</span><span>Away</span>
+          </div>
+        </div>
+        <div class="prob-labels-full">
+          <span>${m.homeTeam}</span><span>Draw</span><span>${m.awayTeam}</span>
+        </div>
+      </div>
+
+      <div class="analysis-card">
+        <div class="card-title">Team form (last 5)</div>
+        <div class="form-row" style="margin-bottom:16px">
+          <div class="form-team">${m.homeTeam}</div>
+          <div class="form-dots">${formDots(m.homeForm)}</div>
+        </div>
+        <div class="form-row">
+          <div class="form-team">${m.awayTeam}</div>
+          <div class="form-dots">${formDots(m.awayForm)}</div>
+        </div>
+        <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border)">
+          <div style="font-size:11px;color:var(--text3);display:flex;gap:12px">
+            <span><span class="form-dot form-W" style="display:inline-flex;width:16px;height:16px;font-size:9px">W</span> Win</span>
+            <span><span class="form-dot form-D" style="display:inline-flex;width:16px;height:16px;font-size:9px">D</span> Draw</span>
+            <span><span class="form-dot form-L" style="display:inline-flex;width:16px;height:16px;font-size:9px">L</span> Loss</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="analysis-card-full">
+      <div class="card-title">Key match statistics</div>
+      <div style="margin-bottom:8px;display:flex;justify-content:space-between;font-size:11px;color:var(--text3)">
+        <span style="font-weight:500;color:var(--accent)">${m.homeTeam}</span>
+        <span></span>
+        <span style="font-weight:500;color:var(--text2)">${m.awayTeam}</span>
