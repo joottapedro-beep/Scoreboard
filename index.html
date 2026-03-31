@@ -71,14 +71,51 @@ header strong {
 }
 
 /* NEWS */
-.news-card img {
-  width: 100%;
-  border-radius: 10px;
+.news-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
 }
 
-.news-card h3 {
-  margin: 10px 0 5px;
-  font-size: 16px;
+.news-card {
+  background: white;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+}
+
+.news-card img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+}
+
+.news-content {
+  padding: 16px;
+}
+
+.news-date {
+  font-size: 12px;
+  color: #6b7280;
+  margin-bottom: 8px;
+}
+
+.news-title {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.news-desc {
+  font-size: 14px;
+  color: #6b7280;
+  margin-bottom: 12px;
+}
+
+.news-link {
+  color: #16a34a;
+  font-weight: 500;
+  font-size: 14px;
 }
   </style>
 </head>
@@ -158,20 +195,16 @@ function renderGames() {
 }
   const NEWS = [
   {
-    title: "Benfica em risco na Champions",
-    image: "https://images.unsplash.com/photo-1508098682722-e99c43a406b2",
+    title: "Benfica em risco de eliminação precoce na Liga dos Campeões",
+    desc: "O Benfica enfrenta um momento delicado na Liga dos Campeões...",
+    date: "22/01/2026",
+    image: "https://images.unsplash.com/photo-1517927033932-b3d18e61fb3a"
   },
   {
-    title: "Rafa Silva reforça ataque",
-    image: "https://images.unsplash.com/photo-1517927033932-b3d18e61fb3a",
-  },
-  {
-    title: "Porto rumo a Campeão",
-    image: "https://images.unsplash.com/photo-1508098682712-e99c43a406b2",
-  },
-    {
-    title: "Benfica elinado da Champiosn",
-    image: "https://images.unsplash.com/photo-1509098682712-e99c43a406b2",
+    title: "Rafa Silva é reforço do Benfica e chega para elevar a qualidade ofensiva!",
+    desc: "O Sport Lisboa e Benfica confirmou a chegada de Rafa Silva...",
+    date: "22/01/2026",
+    image: "https://images.unsplash.com/photo-1508098682722-e99c43a406b2"
   }
 ];
 
@@ -179,11 +212,16 @@ function renderNews() {
   const container = document.getElementById("news-list");
 
   container.innerHTML = `
-    <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+    <div class="news-grid">
       ${NEWS.map(n => `
-        <div class="card news-card">
+        <div class="news-card">
           <img src="${n.image}">
-          <h3>${n.title}</h3>
+          <div class="news-content">
+            <div class="news-date">📅 ${n.date}</div>
+            <div class="news-title">${n.title}</div>
+            <div class="news-desc">${n.desc}</div>
+            <div class="news-link">Ler mais →</div>
+          </div>
         </div>
       `).join('')}
     </div>
