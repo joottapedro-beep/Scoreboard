@@ -147,7 +147,7 @@ function renderGames() {
             <tr style="border-top:1px solid #eee;">
               <td style="padding:10px 0;">Agora</td>
               <td><span style="color:red; font-size:12px;">● Ao Vivo</span></td>
-              <td>${m.league}</td>
+              <td style="color:#666;">${m.league.toUpperCase()}</td>
               <td><strong>${m.home}</strong> vs ${m.away}</td>
             </tr>
           `).join('')}
@@ -159,23 +159,27 @@ function renderGames() {
   const NEWS = [
   {
     title: "Benfica em risco na Champions",
-    image: "https://via.placeholder.com/400x200",
+    image: "https://images.unsplash.com/photo-1508098682722-e99c43a406b2",
   },
   {
     title: "Rafa Silva reforça ataque",
-    image: "https://via.placeholder.com/400x200",
+    image: "https://images.unsplash.com/photo-1517927033932-b3d18e61fb3a",
   }
 ];
 
 function renderNews() {
   const container = document.getElementById("news-list");
 
-  container.innerHTML = NEWS.map(n => `
-    <div class="card news-card">
-      <img src="${n.image}">
-      <h3>${n.title}</h3>
+  container.innerHTML = `
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+      ${NEWS.map(n => `
+        <div class="card news-card">
+          <img src="${n.image}">
+          <h3>${n.title}</h3>
+        </div>
+      `).join('')}
     </div>
-  `).join('');
+  `;
 }
   renderGames();
 renderNews();
