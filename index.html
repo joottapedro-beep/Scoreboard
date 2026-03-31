@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta
+    name="description"
+    content="Plataforma moderna de futebol com jogos ao vivo, notícias em destaque e estrutura pronta para API, Telegram e tracking."
+  >
+  <title>Football Analyst | Live Scores & Noticias</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  >
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="site-shell">
+    <header class="site-header">
+      <div class="brand-block">
+        <a class="brand" href="#home" aria-label="Football Analyst - ir para a homepage">
+          <span class="brand-mark">FA</span>
+          <span>
+            <strong>Football Analyst</strong>
+            <small>Live football intelligence</small>
+          </span>
+        </a>
+      </div>
+
+      <nav class="top-nav" aria-label="Navegacao principal">
+        <a class="nav-link" href="#home">Jogos</a>
+        <a class="nav-link" href="#news">Noticias</a>
+        <a class="nav-link nav-link-accent" href="#telegram">Telegram</a>
+      </nav>
+    </header>
+
+    <main class="page">
+      <section id="home-view" class="view is-active" aria-label="Pagina inicial">
+        <section class="hero">
+          <div class="hero-copy">
+            <span class="eyebrow">Futebol em tempo real</span>
+            <h1>Resultados ao vivo e noticias com uma experiencia limpa e pronta para escalar.</h1>
+            <p>
+              Acompanhe os jogos que estao a decorrer, descubra contexto editorial e prepare a
+              conversao para Telegram numa base tecnica leve e profissional.
+            </p>
+
+            <div class="hero-actions">
+              <a class="button button-primary" href="#live">Ver jogos ao vivo</a>
+              <a class="button button-secondary" href="#news">Explorar noticias</a>
+            </div>
+          </div>
+
+          <aside class="hero-panel card">
+            <div class="hero-panel-header">
+              <span class="panel-kicker">Match pulse</span>
+              <span class="status-dot">Atualizado agora</span>
+            </div>
+
+            <div class="hero-stats" id="hero-stats">
+              <div>
+                <strong>0</strong>
+                <span>Jogos live</span>
+              </div>
+              <div>
+                <strong>0</strong>
+                <span>Ligas ativas</span>
+              </div>
+              <div>
+                <strong>0</strong>
+                <span>Artigos</span>
+              </div>
+            </div>
+
+            <p class="hero-panel-note">
+              Estrutura preparada para API de futebol, captacao para Telegram e tracking de
+              interacoes.
+            </p>
+          </aside>
+        </section>
+
+        <section id="live" class="section-block">
+          <div class="section-heading">
+            <div>
+              <span class="section-kicker">Top section</span>
+              <h2>Jogos ao vivo</h2>
+              <p>Só os encontros em direto, com leitura visual rapida e espaco para filtros por liga.</p>
+            </div>
+
+            <div class="league-filters" id="league-filters" aria-label="Filtrar jogos por liga"></div>
+          </div>
+
+          <div class="card live-card">
+            <div class="live-table-head">
+              <span>Live scoreboard</span>
+              <span class="table-meta" id="live-summary">0 jogos encontrados</span>
+            </div>
+            <div id="matches-table" class="matches-table"></div>
+          </div>
+        </section>
+
+        <section id="news" class="section-block">
+          <div class="section-heading">
+            <div>
+              <span class="section-kicker">Editorial</span>
+              <h2>Ultimas noticias</h2>
+              <p>Conteudo em formato de cards, desenhado para leitura rapida e abertura de artigo sem reload.</p>
+            </div>
+          </div>
+
+          <div id="news-grid" class="news-grid"></div>
+        </section>
+
+        <section id="telegram" class="section-block">
+          <div class="telegram-banner card">
+            <div>
+              <span class="section-kicker">Futuro funnel</span>
+              <h2>Pronto para converter audiencia em subscritores.</h2>
+              <p>
+                O layout ja inclui pontos naturais para CTA, tracking de cliques e integracao futura
+                com links e campanhas de Telegram.
+              </p>
+            </div>
+
+            <a href="#" class="button button-primary" data-track="telegram_cta">Entrar no Telegram</a>
+          </div>
+        </section>
+      </section>
+
+      <section id="article-view" class="view" aria-label="Pagina de noticia">
+        <article class="article-shell card">
+          <button id="back-button" class="back-button" type="button">Voltar</button>
+          <div id="article-content"></div>
+        </article>
+      </section>
+    </main>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
