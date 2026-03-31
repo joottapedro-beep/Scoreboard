@@ -71,6 +71,21 @@
 </div>
 
 <script>
+  function showSection(section) {
+  document.getElementById('games').style.display = 'none';
+  document.getElementById('news').style.display = 'none';
+
+  document.getElementById(section).style.display = 'block';
+
+  // atualizar botão ativo
+  document.querySelectorAll('.btn').forEach(b => b.classList.remove('active'));
+
+  if (section === 'games') {
+    document.querySelectorAll('.btn')[0].classList.add('active');
+  } else {
+    document.querySelectorAll('.btn')[1].classList.add('active');
+  }
+}
 </script>
 
 </body>
